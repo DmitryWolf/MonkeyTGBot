@@ -52,7 +52,7 @@ int main(){
                 fprintf(stderr, "Failed to restart connection.\n");
                 sleep(1);
             }
-            bot.offset-=2; // move offset to resend message
+            bot.offset-=2; // move offset to resend message (do we need this?)
         }
     }
     
