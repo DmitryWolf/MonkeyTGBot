@@ -2,24 +2,9 @@
 #include <signal.h>
 #include <unistd.h>
 
-Telebot bot;
-
-// void handle_sigint(int sig) {
-//     printf("Caught signal %d (Ctrl+C). Exiting gracefully...\n", sig);
-//     telebot_destroy(&bot);
-//     exit(0);
-// }
-
-void SignalHandler(int signal) {
-    if (signal == SIGINT || signal == SIGTERM) {
-        telebot_destroy(&bot);
-        printf("Bye!\n\n");
-    }
-}
 
 int main(){
-    // signal(SIGINT, SignalHandler);
-    // signal(SIGTERM, SignalHandler);
+    Telebot bot;
 
     if (telebot_init(&bot, "resources/token.txt") == -1) {
         return -1;
@@ -27,7 +12,7 @@ int main(){
     
     printf("Bot started\n\n");
     while (1) {
-        char response[2*RESPONSE_SIZE];
+        char response[RESPONSE_SIZE];
         if (telebot_get_updates(&bot, response, sizeof(response)) == 0) {
             telebot_process_updates(&bot, response);
         } else { 

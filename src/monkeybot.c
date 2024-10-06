@@ -253,7 +253,9 @@ void make_sticker_message_with_reply(
 
 int send_https_request(connection* context, const char *request, char *response, size_t response_size) {
     int bytes;
-    
+    size_t total_bytes_read = 0;
+    size_t brackets_count = 0;
+
     // if (SSL_get_error(context->ssl, bytes) == SSL_ERROR_SYSCALL) {
     //     perror("SSL_write error");
     //     ERR_print_errors_fp(stderr);
@@ -262,15 +264,36 @@ int send_https_request(connection* context, const char *request, char *response,
     if (bytes <= 0) {
         ERR_print_errors_fp(stderr);
         return -1;
-    } 
-
-    bytes = SSL_read(context->ssl, response, response_size - 1);
-    if (bytes <= 0) {
-        ERR_print_errors_fp(stderr);
-        return -1;
     }
 
-    response[bytes] = '\0';
+    while (1) {
+        bytes = SSL_read(context->ssl, response + total_bytes_read, response_size - total_bytes_read - 1);
+        if (bytes <= 0) {
+            int ssl_err = SSL_get_error(context->ssl, bytes);
+            if (ssl_err == SSL_ERROR_WANT_READ || ssl_err == SSL_ERROR_WANT_WRITE) {
+                continue;
+            } else {
+                ERR_print_errors_fp(stderr);
+                return -1;
+            }
+        }
+        total_bytes_read += bytes;
+        if (bytes % SSLREAD_SIZE != 0) {
+            break;
+        } else { // Bracket Sequences
+            for (size_t i = total_bytes_read - bytes; i < total_bytes_read; ++i) {
+                if (response[i] == '{') {
+                    brackets_count++;
+                } else if (response[i] == '}') {
+                    brackets_count--;
+                }
+            }
+            if (brackets_count == 0) {
+                break;
+            }
+        }
+    }
+    response[total_bytes_read] = '\0';
     return bytes;
 }
 
