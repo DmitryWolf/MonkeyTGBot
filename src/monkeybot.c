@@ -1,6 +1,7 @@
 #include "monkeybot.h"
 #include "task.h"
 #include "hash.h"
+#include "logger.h"
 
 #include <unistd.h>
 #include <netdb.h>
@@ -38,6 +39,7 @@
 void send_msg(void* args) {
     Task* task = (Task*)(args);
     // print_task_info(task);
+
     char request[REQUEST_SIZE];
     char response[RESPONSE_SIZE];
     
@@ -61,8 +63,7 @@ void send_msg(void* args) {
             break;
     }
     
-    // Debug
-    // printf("Sending request:\n%s\n", request);
+    LOG(REQUEST_PATH, request, 0);
 
     if (send_https_request(task->context, request, response, sizeof(response)) == -1) {
         fprintf(stderr, "Error in sending request\n");
@@ -72,8 +73,8 @@ void send_msg(void* args) {
         connection_init(task->context, task->bot->host, task->bot->port, 1);
     }
     
-    // Debug
-    // printf("Response:\n%s\n", response);
+    LOG(RESPONSE_PATH, response, 1);
+
     free(task);
 }
 
@@ -115,8 +116,7 @@ int telebot_get_updates(Telebot *bot, char *response, size_t response_size) {
     
     make_update_request(bot, request);
 
-    // Debug
-    // printf("Sending getUpdates request:\n%s\n", request);
+    LOG(REQUEST_PATH, request, 0);;
 
     if (send_https_request(&bot->context, request, response, response_size) == -1) {
         fprintf(stderr, "Error in sending getUpdates request\n"); // Выводим ошибку, если отправка не удалась
@@ -124,8 +124,7 @@ int telebot_get_updates(Telebot *bot, char *response, size_t response_size) {
         return -1;
     }
 
-    // Debug
-    // printf("getUpdates Response:\n%s\n", response);
+    LOG(RESPONSE_PATH, response, 1);
 
     // Find last update_id
     char *update_id_str = response;

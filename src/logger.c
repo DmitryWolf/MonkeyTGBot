@@ -20,7 +20,7 @@ void LOG(const char *path, const char *text, int isJSONResponse) {
 
     FILE *file = fopen(path, "a");
     if (!file) {
-        fprintf(stderr, "Не удалось открыть лог-файл.\n");
+        fprintf(stderr, "Error in opening log-file\n");
         return;
     }
 
