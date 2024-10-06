@@ -10,7 +10,6 @@ To run the program, you need to install libraries [openssl](https://github.com/o
 
 - How to install dependencies on Ubuntu 20.04:
 ```
-sudo apt update
 sudo apt install libssl-dev
 sudo apt install libjansson-dev
 ```
@@ -59,16 +58,16 @@ There are several parameters that can be changed:
 
 ---
 #### Files
-The bot token is in the file **(just write token in 1 line)**:
+- The bot token is in the file **(just write token in 1 line)**:
 ```
 resources/token.txt
 ```
-Banwords are stored in a file **(you should put 1 word in one line)**:
+- Banwords are stored in a file **(you should put 1 word in one line)**:
 ```
 resources/banwords.txt
 ```
 
-The possible text answers of the bot are in the file **(you should put 1 answer in one line)**:
+- The possible text answers of the bot are in the file **(you should put 1 answer in one line)**:
 ```
 resources/monkeyanswers.txt
 ```
@@ -78,15 +77,15 @@ resources/monkeyanswers.txt
 resources/monkeystickers.txt
 ```
 ---
-To compile and run, invoke:
+- To compile and run, invoke:
 ```
 $ make
 ```
-To compile in thread debug mode and run, invoke:
+- To compile in thread debug mode and run, invoke:
 ```
 $ make thread
 ```
-To compile in address debug mode and run, invoke:
+- To compile in address debug mode and run, invoke:
 ```
 $ make debug
 ```
