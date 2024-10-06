@@ -77,6 +77,7 @@ resources/monkeyanswers.txt
 resources/monkeystickers.txt
 ```
 ---
+#### Run
 - To compile and run, invoke:
 ```
 $ make
