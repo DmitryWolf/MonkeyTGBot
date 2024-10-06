@@ -55,6 +55,14 @@ There are several parameters that can be changed:
 ```
 #define MAX_LINE_LEN 256
 ```
+- Path to requests logs (logger.h)
+```
+#define REQUEST_PATH "resources/logs/requests.txt"
+```
+- Path to responses logs (logger.h)
+```
+#define RESPONSE_PATH "resources/logs/responses.txt"
+```
 
 ---
 #### Files
@@ -75,6 +83,11 @@ resources/monkeyanswers.txt
 - The possible sticker answers of the bot are in the file **(you should put 1 sticker id in one line)**:
 ```
 resources/monkeystickers.txt
+```
+
+- Logs are stored in
+```
+resources/logs
 ```
 ---
 #### Run
