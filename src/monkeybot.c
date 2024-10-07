@@ -37,7 +37,7 @@ void send_msg(void* args) {
     LOG(REQUEST_PATH, request, 0);
 
     while (send_https_request(task->context, request, response, sizeof(response)) == -1) {
-        fprintf(stderr, "Error in sending message request\n");
+        // fprintf(stderr, "Error in sending message request\n");
         while (connection_restart(task->context, task->bot->host, task->bot->port) == -1);
     }
     
@@ -113,7 +113,7 @@ int telebot_get_updates(Telebot *bot, char *response, size_t response_size) {
     LOG(REQUEST_PATH, request, 0);
 
     while (send_https_request(&bot->context, request, response, response_size) == -1) {
-        fprintf(stderr, "Error in sending getUpdates request\n");
+        // fprintf(stderr, "Error in sending getUpdates request\n");
         while (connection_restart(&bot->context, bot->host, bot->port) == -1);
     }
 
