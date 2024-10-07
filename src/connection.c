@@ -8,6 +8,11 @@ int connection_init(connection* context, const char *host, const char *port, int
     if (type == 0) {
         context->ctx = init_ssl_context();
     }
+    if (type == 1) {
+        SSL_shutdown(context->ssl);
+        close(context->sockfd);
+        SSL_free(context->ssl);
+    }
     context->sockfd = create_socket_connection(host, port); // TODO: check is_socket_alive
     if (context->sockfd == -1) {
         SSL_CTX_free(context->ctx);
