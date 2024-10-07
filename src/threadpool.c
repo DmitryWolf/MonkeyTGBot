@@ -8,10 +8,10 @@ int threadpool_init(threadpool* tp , task_function func, const char* host, const
         if (connection_init(&tp->contexts_[i], host, port) == -1) {
             return -1;
         }
-        threadpool_with_connection *TPWC = malloc(sizeof(threadpool_with_connection));
-        TPWC->tp = tp;
-        TPWC->context_ = &tp->contexts_[i];
-        if (pthread_create(&tp->workers_[i], NULL, worker_routine, (void*)TPWC) != 0) {
+        threadpool_with_connection *tpwc = malloc(sizeof(threadpool_with_connection));
+        tpwc->tp_ = tp;
+        tpwc->context_ = &tp->contexts_[i];
+        if (pthread_create(&tp->workers_[i], NULL, worker_routine, (void*)tpwc) != 0) {
             perror("Failed to create the thread");
             return -1;
         }
@@ -40,15 +40,15 @@ int threadpool_join(threadpool* tp) {
 }
 
 void* worker_routine(void* arg) {
-    threadpool_with_connection* TPWC = (threadpool_with_connection*)arg;
+    threadpool_with_connection* tpwc = (threadpool_with_connection*)arg;
     while (1) {
-        Task* task = (Task*)mpmcqueue_take(&TPWC->tp->tasks_);
+        Task* task = (Task*)mpmcqueue_take(&tpwc->tp_->tasks_);
         if (!task) {
             break;
         }
-        task->context_ = TPWC->context_;
-        TPWC->tp->task_function_(task);
+        task->context_ = tpwc->context_;
+        tpwc->tp_->task_function_(task);
     }
-    free(TPWC);
+    free(tpwc);
     return NULL;
 }

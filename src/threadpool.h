@@ -24,7 +24,7 @@ int threadpool_join(threadpool* tp);
 void* worker_routine(void* arg);
 
 typedef struct {
-    threadpool* tp;
+    threadpool* tp_;
     connection* context_;
 } threadpool_with_connection;
 
