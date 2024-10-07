@@ -66,11 +66,15 @@ void send_msg(void* args) {
     LOG(REQUEST_PATH, request, 0);
 
     if (send_https_request(task->context, request, response, sizeof(response)) == -1) {
-        fprintf(stderr, "Error in sending request\n");
-        perror("Error in sending request");
-
         // restart threadpool_worker's connection 
         connection_init(task->context, task->bot->host, task->bot->port, 1);
+        int cnt_time = 1;
+        while (send_https_request(task->context, request, response, sizeof(response)) == -1) {
+            sleep(cnt_time);
+            cnt_time = min(cnt_time + 1, TIME_TO_SLEEP);
+            fprintf(stderr, "Error in sending message request\n");
+            connection_init(task->context, task->bot->host, task->bot->port, 1);
+        }
     }
     
     LOG(RESPONSE_PATH, response, 1);
@@ -95,6 +99,8 @@ int telebot_init(Telebot *bot, const char *token_path) {
         return -1;
     }
 
+    LOG_INIT();
+
     threadpool_init(&bot->pool, send_msg, bot->host, bot->port);
 
     SSL_library_init();
@@ -108,6 +114,7 @@ void telebot_destroy(Telebot *bot) {
     threadpool_join(&bot->pool);
     connection_destroy(&bot->context);
     EVP_cleanup();
+    LOG_DESTROY();
 }
 
 
@@ -119,9 +126,14 @@ int telebot_get_updates(Telebot *bot, char *response, size_t response_size) {
     LOG(REQUEST_PATH, request, 0);;
 
     if (send_https_request(&bot->context, request, response, response_size) == -1) {
-        fprintf(stderr, "Error in sending getUpdates request\n"); // Выводим ошибку, если отправка не удалась
-        // sleep(1);
-        return -1;
+        connection_init(&bot->context, bot->host, bot->port, 1);
+        int cnt_time = 1;
+        while (send_https_request(&bot->context, request, response, response_size) == -1) {
+            sleep(cnt_time);
+            cnt_time = min(cnt_time + 1, TIME_TO_SLEEP);
+            fprintf(stderr, "Error in sending getUpdates request\n");
+            connection_init(&bot->context, bot->host, bot->port, 1);
+        }
     }
 
     LOG(RESPONSE_PATH, response, 1);

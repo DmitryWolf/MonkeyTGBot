@@ -13,6 +13,7 @@
 #define RESPONSE_SIZE 32768
 #define LIMIT_REQUESTS 100
 #define SSLREAD_SIZE 16384 // max size of 1 SSL_read response
+#define TIME_TO_SLEEP 60
 
 typedef enum{
     TEXT = 0,

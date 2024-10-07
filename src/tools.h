@@ -4,6 +4,7 @@
 #include <stdio.h>
 // #define printf if (0) printf
 
+#define min(a, b) ((a) < (b) ? (a) : (b))
 #define MAX_LINE_LEN 256
 
 // Read information from a file
