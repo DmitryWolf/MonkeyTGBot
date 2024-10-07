@@ -23,10 +23,10 @@ void LOG(const char *path, const char *text, int isJSONResponse) {
     } else {
         body = text;
     }
-
     size_t size = strlen(body);
 
-    
+    pthread_mutex_lock(&mutex_log_);
+
 
     time_t rawtime;
     struct tm *timeinfo;
@@ -36,7 +36,6 @@ void LOG(const char *path, const char *text, int isJSONResponse) {
     char timeBuffer[20];
     strftime(timeBuffer, sizeof(timeBuffer), "%Y-%m-%d %H:%M:%S", timeinfo);
 
-    pthread_mutex_lock(&mutex_log_);
 
     FILE *file = fopen(path, "a");
     if (!file) {
@@ -47,6 +46,7 @@ void LOG(const char *path, const char *text, int isJSONResponse) {
     fwrite(body, 1, size, file);
     fprintf(file, "\n");
     fclose(file);
+
 
     pthread_mutex_unlock(&mutex_log_);
     

@@ -5,7 +5,7 @@ int threadpool_init(ThreadPool* tp , TaskFunction func, const char* host, const 
     MPMCQueue_init(&tp->tasks_);
     tp->task_function = func;
     for (int i = 0; i < THREAD_NUM; ++i) {
-        if (connection_init(&tp->contexts[i], host, port, 0) == -1) {
+        if (connection_init(&tp->contexts[i], host, port) == -1) {
             return -1;
         }
         ThreadPoolWithConnection *TPWC = malloc(sizeof(ThreadPoolWithConnection));

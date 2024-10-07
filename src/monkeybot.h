@@ -43,7 +43,6 @@ typedef struct {
 // Send message (using in threadpool)
 void send_msg(void* args);
 
-
 // Initialize Telebot structure
 int telebot_init(Telebot *bot, const char *token_path);
 

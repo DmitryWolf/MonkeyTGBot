@@ -9,8 +9,17 @@ typedef struct {
     int sockfd;
 } connection;
 
+// Initialize SSL library (should be called once in a multi-threaded program)
+void SSL_init();
+
+// Destroy SSL library (should be called once in a multi-threaded program)
+void SSL_destroy();
+
 // Constructor
-int connection_init(connection* context, const char *host, const char *port, int type);
+int connection_init(connection* context, const char *host, const char *port);
+
+// Restart connection
+int connection_restart(connection* context, const char *host, const char *port);
 
 // Destructor
 void connection_destroy(connection* context);

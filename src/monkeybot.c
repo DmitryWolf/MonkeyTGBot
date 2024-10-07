@@ -7,74 +7,38 @@
 #include <netdb.h>
 #include <openssl/err.h>
 
-// Debug
-// void print_task_info(Task* task) {
-//     if (task == NULL) {
-//         printf("Task is NULL\n");
-//         return;
-//     }
-    
-//     printf("Telebot pointer: %p\n", (void*)task->bot);
-    
-//     if (task->message != NULL) {
-//         printf("Message: %s\n", task->message);
-//     } else {
-//         printf("Message is NULL\n");
-//     }
-
-//     printf("TelegramMessage pointer: %p\n", (void*)task->tm);
-
-//     if (task->context != NULL) {
-//         printf("Connection:\n");
-//         printf("  SSL_CTX pointer: %p\n", (void*)task->context->ctx);
-//         printf("  SSL pointer: %p\n", (void*)task->context->ssl);
-//         printf("  Socket file descriptor: %d\n", task->context->sockfd);
-//     } else {
-//         printf("Connection context is NULL\n");
-//     }
-
-//     printf("Message type: %d\n", task->type);
-// }
 
 void send_msg(void* args) {
     Task* task = (Task*)(args);
-    // print_task_info(task);
 
     char request[REQUEST_SIZE];
     char response[RESPONSE_SIZE];
-    
-    char escaped_message[DEFAULT_SIZE]; 
+
+    char escaped_message[DEFAULT_SIZE];
     normalize_url_request(task->message, escaped_message, sizeof(escaped_message));
 
-    switch (task->type){
-        case TEXT:
+    switch(task->type) {
+        case TEXT:{
             make_text_message(task->bot, escaped_message, request, task->tm->chat_id);
-            break;
-        case REPLY_TEXT:
+        } break;
+        case REPLY_TEXT:{
             make_text_message_with_reply(task->bot, escaped_message, request, task->tm->chat_id, task->tm->message_id);
-            break;
-        case REPLY_STICKER:
+        } break;
+        case REPLY_STICKER:{
             make_sticker_message_with_reply(
-                task->bot, task->bot->monkey_stickers[myrandom(0, task->bot->count_monkey_stickers - 1)], 
+                task->bot, task->bot->monkey_stickers[myrandom(0, task->bot->count_monkey_stickers - 1)],
                 request, task->tm->chat_id, task->tm->message_id
             );
-            break;
+        } break;
         default:
             break;
     }
-    
+
     LOG(REQUEST_PATH, request, 0);
 
-    if (send_https_request(task->context, request, response, sizeof(response)) == -1) {
-        // restart threadpool_worker's connection 
-        connection_init(task->context, task->bot->host, task->bot->port, 1);
-        int cnt_time = 1;
-        while (send_https_request(task->context, request, response, sizeof(response)) == -1) {
-            sleep(cnt_time);
-            cnt_time = min(cnt_time + 1, TIME_TO_SLEEP);
-            fprintf(stderr, "Error in sending message request\n");
-            connection_init(task->context, task->bot->host, task->bot->port, 1);
-        }
+    while (send_https_request(task->context, request, response, sizeof(response)) == -1) {
+        fprintf(stderr, "Error in sending message request\n");
+        while (connection_restart(task->context, task->bot->host, task->bot->port) == -1);
     }
     
     LOG(RESPONSE_PATH, response, 1);
@@ -83,29 +47,52 @@ void send_msg(void* args) {
 }
 
 int telebot_init(Telebot *bot, const char *token_path) {
-    bot->host = "api.telegram.org";
-    bot->port = "443";
-    bot->offset = 0;
+    bot->host = "api.telegram.org"; // host
+    bot->port = "443"; // port
+    bot->offset = 0; // offset
 
     bot->banword_count = 0;
-    add_banwords_to_array(bot);
+    add_banwords_to_array(bot); // banword_count, banwords
+    
+    init_rand(); // initialize random
 
-    init_rand();
-    bot->count_monkey_answers = read_lines("resources/monkeyanswers.txt", bot->monkey_answers, MAX_MONKEY_LINES);
-    bot->count_monkey_stickers = read_lines("resources/monkeystickers.txt", bot->monkey_stickers, MAX_MONKEY_LINES);
+    bot->count_monkey_answers = read_lines(
+        "resources/monkeyanswers.txt", 
+        bot->monkey_answers, MAX_MONKEY_LINES
+    ); // count_monkey_answers, monkey_answers
+    if (bot->count_monkey_answers == -1) {
+        perror("read from file with monkey_answers");
+        return -1;
+    }
 
+    bot->count_monkey_stickers = read_lines(
+        "resources/monkeystickers.txt", 
+        bot->monkey_stickers, MAX_MONKEY_LINES
+    ); // count_monkey_stickers, monkey_stickers
+    if (bot->count_monkey_stickers == -1) {
+        perror("read from file with monkey_stickers");
+        return -1;
+    }
+
+    // token
     if (read_line_from_file(bot->token, sizeof(bot->token), token_path) == -1) {
         perror("read from file with token");
         return -1;
     }
-
-    LOG_INIT();
-
-    threadpool_init(&bot->pool, send_msg, bot->host, bot->port);
-
-    SSL_library_init();
     
-    return connection_init(&bot->context, bot->host, bot->port, 0);
+    // connection
+    if (connection_init(&bot->context, bot->host, bot->port) == -1) {
+        perror("connection init");
+        return -1;
+    }
+
+    // threadpool
+    if (threadpool_init(&bot->pool, send_msg, bot->host, bot->port) == -1) {
+        perror("threadpool init");
+        return -1;
+    }
+    
+    return 0;
 }
 
 
@@ -120,20 +107,14 @@ void telebot_destroy(Telebot *bot) {
 
 int telebot_get_updates(Telebot *bot, char *response, size_t response_size) {
     char request[REQUEST_SIZE];
-    
+
     make_update_request(bot, request);
 
-    LOG(REQUEST_PATH, request, 0);;
+    LOG(REQUEST_PATH, request, 0);
 
-    if (send_https_request(&bot->context, request, response, response_size) == -1) {
-        connection_init(&bot->context, bot->host, bot->port, 1);
-        int cnt_time = 1;
-        while (send_https_request(&bot->context, request, response, response_size) == -1) {
-            sleep(cnt_time);
-            cnt_time = min(cnt_time + 1, TIME_TO_SLEEP);
-            fprintf(stderr, "Error in sending getUpdates request\n");
-            connection_init(&bot->context, bot->host, bot->port, 1);
-        }
+    while (send_https_request(&bot->context, request, response, response_size) == -1) {
+        fprintf(stderr, "Error in sending getUpdates request\n");
+        while (connection_restart(&bot->context, bot->host, bot->port) == -1);
     }
 
     LOG(RESPONSE_PATH, response, 1);
@@ -172,23 +153,24 @@ int telebot_process_updates(Telebot *bot, const char *response) {
         if (sizeBans != 0) {
 
             // TODO: add a quote 
-            int* ids_of_symbols = get_len_of_symbols(tm->text);
-            int normalizeBegin = 0, normalizeEnd = 0;
-            int firstBegin = finderBanwords[0], firstEnd = finderBanwords[1];
-            int counterOfSymbols = 0, j = 0;
-            for (int i = 0; i < strlen(tm->text); ++i) {
-                if (ids_of_symbols[i] == 1 || ids_of_symbols[i] == 2) {
-                    counterOfSymbols += ids_of_symbols[i];
-                    j++;
-                    if (counterOfSymbols == firstBegin) {
-                        normalizeBegin = j;
-                    }
-                    if (counterOfSymbols == firstEnd) {
-                        normalizeEnd = j - 1;
-                        break;
-                    }
-                }
-            }
+            // int* ids_of_symbols = get_len_of_symbols(tm->text);
+            // int normalizeBegin = 0, normalizeEnd = 0;
+            // int firstBegin = finderBanwords[0], firstEnd = finderBanwords[1];
+            // int counterOfSymbols = 0, j = 0;
+            // for (int i = 0; i < strlen(tm->text); ++i) {
+            //     if (ids_of_symbols[i] == 1 || ids_of_symbols[i] == 2) {
+            //         counterOfSymbols += ids_of_symbols[i];
+            //         j++;
+            //         if (counterOfSymbols == firstBegin) {
+            //             normalizeBegin = j;
+            //         }
+            //         if (counterOfSymbols == firstEnd) {
+            //             normalizeEnd = j - 1;
+            //             break;
+            //         }
+            //     }
+            // }
+            // free(ids_of_symbols);
             
             MessageType type = myrandom(1, 2);
             char* monkeyword = DEFAULT_MESSAGE;
@@ -203,7 +185,6 @@ int telebot_process_updates(Telebot *bot, const char *response) {
             task->type = type;
             threadpool_submit(&bot->pool, task);
 
-            free(ids_of_symbols);
         }
 
         free(finderBanwords);
@@ -267,10 +248,6 @@ int send_https_request(connection* context, const char *request, char *response,
     size_t total_bytes_read = 0;
     size_t brackets_count = 0;
 
-    // if (SSL_get_error(context->ssl, bytes) == SSL_ERROR_SYSCALL) {
-    //     perror("SSL_write error");
-    //     ERR_print_errors_fp(stderr);
-    // }
     bytes = SSL_write(context->ssl, request, strlen(request));
     if (bytes <= 0) {
         ERR_print_errors_fp(stderr);
@@ -305,7 +282,7 @@ int send_https_request(connection* context, const char *request, char *response,
         }
     }
     response[total_bytes_read] = '\0';
-    return bytes;
+    return total_bytes_read;
 }
 
 

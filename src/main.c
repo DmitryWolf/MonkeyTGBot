@@ -4,7 +4,7 @@
 #include <pthread.h>
 
 Telebot bot;
-int isInitialized = 0;
+volatile sig_atomic_t  isInitialized = 0;
 pthread_t init_thread;
 
 void *init_bot(void *arg) {
@@ -43,17 +43,8 @@ int main(){
     printf("Bot started\n\n");
     while (1) {
         char response[RESPONSE_SIZE];
-        if (telebot_get_updates(&bot, response, sizeof(response)) == 0) {
-            telebot_process_updates(&bot, response);
-        } else { 
-            fprintf(stderr, "Failed to get updates.\n");
-            // restart connection
-            if (connection_init(&bot.context, bot.host, bot.port, 1) == -1) {
-                fprintf(stderr, "Failed to restart connection.\n");
-                sleep(1);
-            }
-            bot.offset-=2; // move offset to resend message (do we need this?)
-        }
+        telebot_get_updates(&bot, response, sizeof(response));
+        telebot_process_updates(&bot, response);
     }
     
     telebot_destroy(&bot);
