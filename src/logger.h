@@ -12,7 +12,7 @@ extern pthread_mutex_t mutex_log_;
 
 void LOG_INIT();
 
-void LOG(const char *path, const char *text, int isJSONResponse);
+void LOG(const char *path, const char *text, int is_JSON_response);
 
 void LOG_DESTROY();
 

@@ -9,9 +9,9 @@ void LOG_INIT() {
     pthread_mutex_init(&mutex_log_, NULL);
 }
 
-void LOG(const char *path, const char *text, int isJSONResponse) {
+void LOG(const char *path, const char *text, int is_JSON_response) {
     const char *body;
-    if (isJSONResponse == 1) {
+    if (is_JSON_response == 1) {
         body = strstr(text, "\r\n\r\n");
         if (!body) {
             printf("Error: The response body was not found\n");
@@ -33,8 +33,8 @@ void LOG(const char *path, const char *text, int isJSONResponse) {
     time(&rawtime);
     timeinfo = localtime(&rawtime);
 
-    char timeBuffer[20];
-    strftime(timeBuffer, sizeof(timeBuffer), "%Y-%m-%d %H:%M:%S", timeinfo);
+    char time_buffer[20];
+    strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%d %H:%M:%S", timeinfo);
 
 
     FILE *file = fopen(path, "a");
@@ -42,7 +42,7 @@ void LOG(const char *path, const char *text, int isJSONResponse) {
         fprintf(stderr, "Error in opening log-file\n");
         return;
     }
-    fprintf(file, "DUMP [%s] : ", timeBuffer);
+    fprintf(file, "DUMP [%s] : ", time_buffer);
     fwrite(body, 1, size, file);
     fprintf(file, "\n");
     fclose(file);

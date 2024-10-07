@@ -5,13 +5,13 @@
 #include <jansson.h>
 
 typedef struct {
-    long long message_id;
-    long long from_id;
-    char first_name[100];
-    char username[100];
-    long long chat_id;
-    char chat_title[100];
-    char text[1024];
+    long long message_id_;
+    long long from_id_;
+    char first_name_[100];
+    char username_[100];
+    long long chat_id_;
+    char chat_title_[100];
+    char text_[1024];
 } TelegramMessage;
 
 TelegramMessage* parse_telegram_response(const char *response, size_t *size);

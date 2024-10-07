@@ -4,22 +4,22 @@
 #include <pthread.h>
 
 Telebot bot;
-volatile sig_atomic_t  isInitialized = 0;
+volatile sig_atomic_t is_initialized = 0;
 pthread_t init_thread;
 
 void *init_bot(void *arg) {
-    if (telebot_init(&bot, "resources/token.txt") == -1) {
+    if (telebot_init(&bot, PATH_TO_TOKEN) == -1) {
         fprintf(stderr, "Failed to initialize bot.\n");
         return NULL;
     }
-    isInitialized = 1;
+    is_initialized = 1;
     printf("Bot initialized in thread.\n");
     return NULL;
 }
 
 void handle_sigint(int sig) {
     printf("\nCompletion of the program...\n");
-    while (isInitialized == 0) {
+    while (is_initialized == 0) {
         // Backoff
         sleep(1);
     }
@@ -36,7 +36,7 @@ int main(){
         return -1;
     }
     pthread_join(init_thread, NULL);
-    if (!isInitialized) {
+    if (!is_initialized) {
         return -1;
     }
 

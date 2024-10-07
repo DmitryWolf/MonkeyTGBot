@@ -15,19 +15,19 @@ void send_msg(void* args) {
     char response[RESPONSE_SIZE];
 
     char escaped_message[DEFAULT_SIZE];
-    normalize_url_request(task->message, escaped_message, sizeof(escaped_message));
+    normalize_url_request(task->message_, escaped_message, sizeof(escaped_message));
 
-    switch(task->type) {
+    switch(task->type_) {
         case TEXT:{
-            make_text_message(task->bot, escaped_message, request, task->tm->chat_id);
+            make_text_message(task->bot_, escaped_message, request, task->tm_->chat_id_);
         } break;
         case REPLY_TEXT:{
-            make_text_message_with_reply(task->bot, escaped_message, request, task->tm->chat_id, task->tm->message_id);
+            make_text_message_with_reply(task->bot_, escaped_message, request, task->tm_->chat_id_, task->tm_->message_id_);
         } break;
         case REPLY_STICKER:{
             make_sticker_message_with_reply(
-                task->bot, task->bot->monkey_stickers[myrandom(0, task->bot->count_monkey_stickers - 1)],
-                request, task->tm->chat_id, task->tm->message_id
+                task->bot_, task->bot_->monkey_stickers_[myrandom(0, task->bot_->count_monkey_stickers_ - 1)],
+                request, task->tm_->chat_id_, task->tm_->message_id_
             );
         } break;
         default:
@@ -36,9 +36,9 @@ void send_msg(void* args) {
 
     LOG(REQUEST_PATH, request, 0);
 
-    while (send_https_request(task->context, request, response, sizeof(response)) == -1) {
+    while (send_https_request(task->context_, request, response, sizeof(response)) == -1) {
         // fprintf(stderr, "Error in sending message request\n");
-        while (connection_restart(task->context, task->bot->host, task->bot->port) == -1);
+        while (connection_restart(task->context_, task->bot_->host_, task->bot_->port_) == -1);
     }
     
     LOG(RESPONSE_PATH, response, 1);
@@ -47,47 +47,47 @@ void send_msg(void* args) {
 }
 
 int telebot_init(Telebot *bot, const char *token_path) {
-    bot->host = "api.telegram.org"; // host
-    bot->port = "443"; // port
-    bot->offset = 0; // offset
+    bot->host_ = "api.telegram.org"; // host_
+    bot->port_ = "443"; // port_
+    bot->offset_ = 0; // offset_
 
-    bot->banword_count = 0;
-    add_banwords_to_array(bot); // banword_count, banwords
+    bot->banword_count_ = 0;
+    add_banwords_to_array(bot); // banword_count_, banwords_
     
     init_rand(); // initialize random
 
-    bot->count_monkey_answers = read_lines(
-        "resources/monkeyanswers.txt", 
-        bot->monkey_answers, MAX_MONKEY_LINES
-    ); // count_monkey_answers, monkey_answers
-    if (bot->count_monkey_answers == -1) {
+    bot->count_monkey_answers_ = read_lines(
+        PATH_TO_TEXT_ANSWERS, 
+        bot->monkey_answers_, MAX_MONKEY_LINES
+    ); // count_monkey_answers_, monkey_answers_
+    if (bot->count_monkey_answers_ == -1) {
         perror("read from file with monkey_answers");
         return -1;
     }
 
-    bot->count_monkey_stickers = read_lines(
-        "resources/monkeystickers.txt", 
-        bot->monkey_stickers, MAX_MONKEY_LINES
-    ); // count_monkey_stickers, monkey_stickers
-    if (bot->count_monkey_stickers == -1) {
-        perror("read from file with monkey_stickers");
+    bot->count_monkey_stickers_ = read_lines(
+        PATH_TO_STICKERS_ANSWERS,
+        bot->monkey_stickers_, MAX_MONKEY_LINES
+    ); // count_monkey_stickers_, monkey_stickers_
+    if (bot->count_monkey_stickers_ == -1) {
+        perror("read from file with monkey_stickers_");
         return -1;
     }
 
-    // token
-    if (read_line_from_file(bot->token, sizeof(bot->token), token_path) == -1) {
+    // token_
+    if (read_line_from_file(bot->token_, sizeof(bot->token_), token_path) == -1) {
         perror("read from file with token");
         return -1;
     }
     
     // connection
-    if (connection_init(&bot->context, bot->host, bot->port) == -1) {
+    if (connection_init(&bot->context_, bot->host_, bot->port_) == -1) {
         perror("connection init");
         return -1;
     }
 
     // threadpool
-    if (threadpool_init(&bot->pool, send_msg, bot->host, bot->port) == -1) {
+    if (threadpool_init(&bot->pool_, send_msg, bot->host_, bot->port_) == -1) {
         perror("threadpool init");
         return -1;
     }
@@ -98,8 +98,8 @@ int telebot_init(Telebot *bot, const char *token_path) {
 
 
 void telebot_destroy(Telebot *bot) {
-    threadpool_join(&bot->pool);
-    connection_destroy(&bot->context);
+    threadpool_join(&bot->pool_);
+    connection_destroy(&bot->context_);
     EVP_cleanup();
     LOG_DESTROY();
 }
@@ -112,9 +112,9 @@ int telebot_get_updates(Telebot *bot, char *response, size_t response_size) {
 
     LOG(REQUEST_PATH, request, 0);
 
-    while (send_https_request(&bot->context, request, response, response_size) == -1) {
+    while (send_https_request(&bot->context_, request, response, response_size) == -1) {
         // fprintf(stderr, "Error in sending getUpdates request\n");
-        while (connection_restart(&bot->context, bot->host, bot->port) == -1);
+        while (connection_restart(&bot->context_, bot->host_, bot->port_) == -1);
     }
 
     LOG(RESPONSE_PATH, response, 1);
@@ -129,7 +129,7 @@ int telebot_get_updates(Telebot *bot, char *response, size_t response_size) {
     }
 
     if (last_update_id != -1) {
-        bot->offset = last_update_id + 1;
+        bot->offset_ = last_update_id + 1;
     }
 
     return 0;
@@ -147,25 +147,25 @@ int telebot_process_updates(Telebot *bot, const char *response) {
             return -1;
         }
 
-        int sizeBans;
-        int* finderBanwords = find_banwords(bot->banwords, bot->banword_count, tm->text, &sizeBans);
+        int size_bans;
+        int* finder_banwords = find_banwords(bot->banwords_, bot->banword_count_, tm->text_, &size_bans);
 
-        if (sizeBans != 0) {
+        if (size_bans != 0) {
 
             // TODO: add a quote 
-            // int* ids_of_symbols = get_len_of_symbols(tm->text);
-            // int normalizeBegin = 0, normalizeEnd = 0;
-            // int firstBegin = finderBanwords[0], firstEnd = finderBanwords[1];
-            // int counterOfSymbols = 0, j = 0;
-            // for (int i = 0; i < strlen(tm->text); ++i) {
+            // int* ids_of_symbols = get_len_of_symbols(tm->text_);
+            // int normalize_begin = 0, normalize_end = 0;
+            // int first_begin = finder_banwords[0], first_end = finder_banwords[1];
+            // int counter_of_symbols = 0, j = 0;
+            // for (int i = 0; i < strlen(tm->text_); ++i) {
             //     if (ids_of_symbols[i] == 1 || ids_of_symbols[i] == 2) {
-            //         counterOfSymbols += ids_of_symbols[i];
+            //         counter_of_symbols += ids_of_symbols[i];
             //         j++;
-            //         if (counterOfSymbols == firstBegin) {
-            //             normalizeBegin = j;
+            //         if (counter_of_symbols == first_begin) {
+            //             normalize_begin = j;
             //         }
-            //         if (counterOfSymbols == firstEnd) {
-            //             normalizeEnd = j - 1;
+            //         if (counter_of_symbols == first_end) {
+            //             normalize_end = j - 1;
             //             break;
             //         }
             //     }
@@ -175,19 +175,19 @@ int telebot_process_updates(Telebot *bot, const char *response) {
             MessageType type = myrandom(1, 2);
             char* monkeyword = DEFAULT_MESSAGE;
             if (type == REPLY_TEXT) {
-                monkeyword = generate_random_monkey_string(bot->monkey_answers, bot->count_monkey_answers);    
+                monkeyword = generate_random_monkey_string(bot->monkey_answers_, bot->count_monkey_answers_);    
             }
             Task* task = malloc(sizeof(Task));
-            task->bot = bot;
-            task->message = monkeyword;
-            task->tm = tm;
-            // task->context: skip
-            task->type = type;
-            threadpool_submit(&bot->pool, task);
+            task->bot_ = bot;
+            task->message_ = monkeyword;
+            task->tm_ = tm;
+            // task->context_: skip
+            task->type_ = type;
+            threadpool_submit(&bot->pool_, task);
 
         }
 
-        free(finderBanwords);
+        free(finder_banwords);
     }
     return 0;
 }
@@ -199,7 +199,7 @@ void make_update_request(Telebot *bot, char* request) {
              "Host: %s\r\n"
              "User-Agent: C-Telegram-Bot/1.0\r\n"
              "Connection: keep-alive\r\n\r\n",
-             bot->token, bot->offset, LIMIT_REQUESTS, bot->host);
+             bot->token_, bot->offset_, LIMIT_REQUESTS, bot->host_);
 }
 
 
@@ -212,7 +212,7 @@ void make_text_message(
              "Host: %s\r\n"
              "User-Agent: C-Telegram-Bot/1.0\r\n"
              "Connection: keep-alive\r\n\r\n",
-             bot->token, chat_id, escaped_message, bot->host);
+             bot->token_, chat_id, escaped_message, bot->host_);
 }
 
 
@@ -226,7 +226,7 @@ void make_text_message_with_reply(
              "Host: %s\r\n"
              "User-Agent: C-Telegram-Bot/1.0\r\n"
              "Connection: keep-alive\r\n\r\n",
-             bot->token, chat_id, escaped_message, reply_to_message_id, bot->host);
+             bot->token_, chat_id, escaped_message, reply_to_message_id, bot->host_);
 }
 
 void make_sticker_message_with_reply(
@@ -239,7 +239,7 @@ void make_sticker_message_with_reply(
              "Host: %s\r\n"
              "User-Agent: C-Telegram-Bot/1.0\r\n"
              "Connection: keep-alive\r\n\r\n",
-             bot->token, chat_id, id_sticker, reply_to_message_id, bot->host);
+             bot->token_, chat_id, id_sticker, reply_to_message_id, bot->host_);
 }
 
 
@@ -248,16 +248,16 @@ int send_https_request(connection* context, const char *request, char *response,
     size_t total_bytes_read = 0;
     size_t brackets_count = 0;
 
-    bytes = SSL_write(context->ssl, request, strlen(request));
+    bytes = SSL_write(context->ssl_, request, strlen(request));
     if (bytes <= 0) {
         ERR_print_errors_fp(stderr);
         return -1;
     }
 
     while (1) {
-        bytes = SSL_read(context->ssl, response + total_bytes_read, response_size - total_bytes_read - 1);
+        bytes = SSL_read(context->ssl_, response + total_bytes_read, response_size - total_bytes_read - 1);
         if (bytes <= 0) {
-            int ssl_err = SSL_get_error(context->ssl, bytes);
+            int ssl_err = SSL_get_error(context->ssl_, bytes);
             if (ssl_err == SSL_ERROR_WANT_READ || ssl_err == SSL_ERROR_WANT_WRITE) {
                 continue;
             } else {
@@ -287,15 +287,15 @@ int send_https_request(connection* context, const char *request, char *response,
 
 
 void add_banwords_to_array(Telebot *bot) {
-    char banmonkeywords[MAX_MONKEY_LINES][MAX_LINE_LEN];
-    int count_of_BMW = read_lines("resources/banwords.txt", banmonkeywords, MAX_MONKEY_LINES);
+    char ban_monkey_words[MAX_MONKEY_LINES][MAX_LINE_LEN];
+    int count_of_BMW = read_lines(PATH_TO_BANWORDS, ban_monkey_words, MAX_MONKEY_LINES);
     if (count_of_BMW < 0) {
         fprintf(stderr, "Error reading banwords from file.\n");
         return;
     }
 
     for (int i = 0; i < count_of_BMW; i++) {
-        add_banword(bot->banwords, &bot->banword_count, banmonkeywords[i]);
+        add_banword(bot->banwords_, &bot->banword_count_, ban_monkey_words[i]);
     }
 }
 

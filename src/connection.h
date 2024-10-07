@@ -4,9 +4,9 @@
 #include <openssl/ssl.h>
 
 typedef struct {
-    SSL_CTX *ctx;
-    SSL *ssl;
-    int sockfd;
+    SSL_CTX *ctx_;
+    SSL *ssl_;
+    int sockfd_;
 } connection;
 
 // Initialize SSL library (should be called once in a multi-threaded program)

@@ -7,6 +7,10 @@
 #include "connection.h" // "threadpoo.h" contains "connection.h"
 #include "threadpool.h"
 
+#define PATH_TO_TOKEN "resources/token.txt"
+#define PATH_TO_BANWORDS "resources/banwords.txt"
+#define PATH_TO_TEXT_ANSWERS "resources/monkeyanswers.txt"
+#define PATH_TO_STICKERS_ANSWERS "resources/monkeystickers.txt"
 #define DEFAULT_MESSAGE ""
 #define DEFAULT_SIZE 1024 
 #define REQUEST_SIZE 2048
@@ -22,22 +26,22 @@ typedef enum{
 } MessageType;
 
 typedef struct {
-    char token[128];
-    const char *host;
-    const char *port;
-    connection context;
-    int offset;
+    char token_[128];
+    const char *host_;
+    const char *port_;
+    connection context_;
+    int offset_;
 
-    Banmonkey banwords[MAX_BANWORDS];
-    int banword_count;
+    Banmonkey banwords_[MAX_BANWORDS];
+    int banword_count_;
 
-    char monkey_answers[MAX_MONKEY_LINES][MAX_LINE_LEN];
-    int count_monkey_answers;
+    char monkey_answers_[MAX_MONKEY_LINES][MAX_LINE_LEN];
+    int count_monkey_answers_;
 
-    char monkey_stickers[MAX_MONKEY_LINES][MAX_LINE_LEN];
-    int count_monkey_stickers;
+    char monkey_stickers_[MAX_MONKEY_LINES][MAX_LINE_LEN];
+    int count_monkey_stickers_;
 
-    ThreadPool pool;
+    threadpool pool_;
 } Telebot;
 
 // Send message (using in threadpool)

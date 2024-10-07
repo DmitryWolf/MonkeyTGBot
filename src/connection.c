@@ -19,37 +19,37 @@ void SSL_destroy() {
 }
 
 int connection_init(connection* context, const char *host, const char *port) {
-    context->ctx = init_ssl_context();
-    if (!context->ctx) {
+    context->ctx_ = init_ssl_context();
+    if (!context->ctx_) {
         return -1;
     }
 
-    context->sockfd = create_socket_connection(host, port);
-    if (context->sockfd == -1) {
-        SSL_CTX_free(context->ctx);
+    context->sockfd_ = create_socket_connection(host, port);
+    if (context->sockfd_ == -1) {
+        SSL_CTX_free(context->ctx_);
         return -1;
     }
 
     if (make_SSL_connection(context) == -1) {
-        close(context->sockfd);
-        SSL_CTX_free(context->ctx);
+        close(context->sockfd_);
+        SSL_CTX_free(context->ctx_);
         return -1;
     }
     return 0;
 }
 
 void connection_destroy(connection* context) {
-    if (context->ssl) {
-        SSL_shutdown(context->ssl);
-        SSL_free(context->ssl);
+    if (context->ssl_) {
+        SSL_shutdown(context->ssl_);
+        SSL_free(context->ssl_);
     }
 
-    if (context->sockfd != -1) {
-        close(context->sockfd);
+    if (context->sockfd_ != -1) {
+        close(context->sockfd_);
     }
 
-    if (context->ctx) {
-        SSL_CTX_free(context->ctx);
+    if (context->ctx_) {
+        SSL_CTX_free(context->ctx_);
     }
 }
 
@@ -107,18 +107,18 @@ int create_socket_connection(const char *host, const char *port) {
 
 
 int make_SSL_connection(connection* context) {
-    context->ssl = SSL_new(context->ctx);
-    if (!context->ssl) {
+    context->ssl_ = SSL_new(context->ctx_);
+    if (!context->ssl_) {
         perror("Unable to create SSL structure");
         ERR_print_errors_fp(stderr);
         return -1;
     }
 
-    SSL_set_fd(context->ssl, context->sockfd);
+    SSL_set_fd(context->ssl_, context->sockfd_);
 
-    if (SSL_connect(context->ssl) <= 0) {
+    if (SSL_connect(context->ssl_) <= 0) {
         ERR_print_errors_fp(stderr);
-        SSL_free(context->ssl);
+        SSL_free(context->ssl_);
         return -1;
     }
 

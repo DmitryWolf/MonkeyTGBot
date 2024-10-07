@@ -4,15 +4,15 @@
 #include <stdlib.h>
 
 typedef struct Node {
-    void *data;
-    struct Node *prev;
-    struct Node *next;
+    void *data_;
+    struct Node *prev_;
+    struct Node *next_;
 } Node;
 
 typedef struct {
-    Node* head;
-    Node* tail;
-    size_t size;
+    Node* head_;
+    Node* tail_;
+    size_t size_;
 } List;
 
 // Constructor

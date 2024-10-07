@@ -59,10 +59,10 @@ TelegramMessage* parse_telegram_response(const char *response, size_t *size) {
     json_array_foreach(result, index, update) {
         json_t *message = json_object_get(update, "message");
         if (message) {
-            // Get message_id
+            // Get message_id_
             json_t *message_id = json_object_get(message, "message_id");
             if (json_is_integer(message_id)) {
-                messages[index].message_id = json_integer_value(message_id);
+                messages[index].message_id_ = json_integer_value(message_id);
             }
 
             // Get info of user
@@ -72,15 +72,15 @@ TelegramMessage* parse_telegram_response(const char *response, size_t *size) {
                 json_t *first_name = json_object_get(from, "first_name");
                 json_t *username = json_object_get(from, "username");
                 if (json_is_integer(from_id)) {
-                    messages[index].from_id = json_integer_value(from_id);
+                    messages[index].from_id_ = json_integer_value(from_id);
                 }
                 if (json_is_string(first_name)) {
-                    strncpy(messages[index].first_name, json_string_value(first_name), sizeof(messages[index].first_name) - 1);
-                    messages[index].first_name[sizeof(messages[index].first_name) - 1] = '\0'; // Overflow protection
+                    strncpy(messages[index].first_name_, json_string_value(first_name), sizeof(messages[index].first_name_) - 1);
+                    messages[index].first_name_[sizeof(messages[index].first_name_) - 1] = '\0'; // Overflow protection
                 }
                 if (json_is_string(username)) {
-                    strncpy(messages[index].username, json_string_value(username), sizeof(messages[index].username) - 1);
-                    messages[index].username[sizeof(messages[index].username) - 1] = '\0'; // Overflow protection
+                    strncpy(messages[index].username_, json_string_value(username), sizeof(messages[index].username_) - 1);
+                    messages[index].username_[sizeof(messages[index].username_) - 1] = '\0'; // Overflow protection
                 }
             }
 
@@ -90,19 +90,19 @@ TelegramMessage* parse_telegram_response(const char *response, size_t *size) {
                 json_t *chat_id = json_object_get(chat, "id");
                 json_t *chat_title = json_object_get(chat, "title");
                 if (json_is_integer(chat_id)) {
-                    messages[index].chat_id = json_integer_value(chat_id);
+                    messages[index].chat_id_ = json_integer_value(chat_id);
                 }
                 if (json_is_string(chat_title)) {
-                    strncpy(messages[index].chat_title, json_string_value(chat_title), sizeof(messages[index].chat_title) - 1);
-                    messages[index].chat_title[sizeof(messages[index].chat_title) - 1] = '\0'; // Overflow protection
+                    strncpy(messages[index].chat_title_, json_string_value(chat_title), sizeof(messages[index].chat_title_) - 1);
+                    messages[index].chat_title_[sizeof(messages[index].chat_title_) - 1] = '\0'; // Overflow protection
                 }
             }
 
             // Get text
             json_t *text = json_object_get(message, "text");
             if (json_is_string(text)) {
-                strncpy(messages[index].text, json_string_value(text), sizeof(messages[index].text) - 1);
-                messages[index].text[sizeof(messages[index].text) - 1] = '\0'; // Overflow protection
+                strncpy(messages[index].text_, json_string_value(text), sizeof(messages[index].text_) - 1);
+                messages[index].text_[sizeof(messages[index].text_) - 1] = '\0'; // Overflow protection
             }
         }
     }

@@ -3,11 +3,11 @@
 #include "monkeybot.h"
 
 typedef struct {
-    Telebot *bot;
-    const char *message;
-    TelegramMessage *tm;
-    connection* context;
-    MessageType type;
+    Telebot *bot_;
+    const char *message_;
+    TelegramMessage *tm_;
+    connection* context_;
+    MessageType type_;
 } Task;
 
 #endif // TASK_H

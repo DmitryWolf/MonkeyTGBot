@@ -47,6 +47,22 @@ There are several parameters that can be changed:
 ```
 #define LIMIT_REQUESTS 100
 ```
+- Path to the token (monkeybot.h)
+```
+#define PATH_TO_TOKEN "resources/token.txt"
+```
+- Path to the banwords (monkeybot.h)
+```
+#define PATH_TO_BANWORDS "resources/banwords.txt"
+```
+- Path to text answers (monkeybot.h)
+```
+#define PATH_TO_TEXT_ANSWERS "resources/monkeyanswers.txt"
+```
+- Path to IDs of stickers (monkeybot.h)
+```
+#define PATH_TO_STICKERS_ANSWERS "resources/monkeystickers.txt"
+```
 - The maximum size of workers in Thread Pool (threadpool.h)
 ```
 #define THREAD_NUM 16
@@ -63,7 +79,6 @@ There are several parameters that can be changed:
 ```
 #define RESPONSE_PATH "resources/logs/responses.txt"
 ```
-
 ---
 #### Files
 - The bot token is in the file **(just write token in 1 line)**:

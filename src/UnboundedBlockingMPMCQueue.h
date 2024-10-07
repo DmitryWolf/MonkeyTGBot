@@ -6,16 +6,16 @@
 
 typedef struct {
     List buffer;
-    pthread_mutex_t mutex_;
-    pthread_cond_t not_empty_; 
-} UnboundedBlockngMPMCQueue;
+    pthread_mutex_t mutex;
+    pthread_cond_t not_empty; 
+} unbounded_blockng_mpmc_queue;
 
-void MPMCQueue_init(UnboundedBlockngMPMCQueue *MPMCQueue);
+void mpmcqueue_init(unbounded_blockng_mpmc_queue *mpmc_queue);
 
-void MPMCQueue_clear(UnboundedBlockngMPMCQueue *MPMCQueue);
+void mpmcqueue_clear(unbounded_blockng_mpmc_queue *mpmc_queue);
 
-void MPMCQueue_put(UnboundedBlockngMPMCQueue *MPMCQueue, void *value);
+void mpmcqueue_put(unbounded_blockng_mpmc_queue *mpmc_queue, void *value);
 
-void* MPMCQueue_take(UnboundedBlockngMPMCQueue *MPMCQueue);
+void* mpmcqueue_take(unbounded_blockng_mpmc_queue *mpmc_queue);
 
 #endif // UNBOUNDED_BLOCKING_MPMC_QUEUE_H

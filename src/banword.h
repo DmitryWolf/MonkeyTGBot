@@ -4,8 +4,8 @@
 #define MAX_BANWORDS 100
 
 typedef struct {
-    char *word;
-    unsigned long hash;
+    char *word_;
+    unsigned long hash_;
 } Banmonkey;
 
 
