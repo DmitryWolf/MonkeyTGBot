@@ -70,6 +70,11 @@ SSL_CTX *init_ssl_context() {
         return NULL;
     }
 
+    // Set up options SSL_OP_IGNORE_UNEXPECTED_EOF
+    long options = SSL_CTX_get_options(ctx);
+    options |= SSL_OP_IGNORE_UNEXPECTED_EOF;
+    SSL_CTX_set_options(ctx, options);
+
     return ctx;
 }
 
