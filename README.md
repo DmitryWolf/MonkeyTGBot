@@ -6,17 +6,18 @@ It was conceived as a bot that sends monkey phrases or stickers with monkeys, bu
 The bot looks at the messages that are sent to him/ in conversation with him, searches for the occurrence of bahword in the message and, if found, randomly sends either a random phrase or a random sticker in response to this message.
 
 ### Dependencies
-To run the program, you need to install libraries [openssl](https://github.com/openssl/openssl) and [jansson](https://github.com/akheron/jansson)
+First of all, you need to download [Docker](https://docs.docker.com/get-started/get-docker/).
 
+Secondly, too run the program, you need to install libraries [openssl](https://github.com/openssl/openssl) and [jansson](https://github.com/akheron/jansson)
 - How to install dependencies on Ubuntu 20.04:
 ```
-sudo apt install libssl-dev
-sudo apt install libjansson-dev
+$ sudo apt install libssl-dev
+$ sudo apt install libjansson-dev
 ```
 -  How to install dependencies on Mac OS via the brew package manager (https://brew.sh/):
 ```
-brew install openssl
-brew install jansson
+$ brew install openssl
+$ brew install jansson
 ```
 
 ### Usage
@@ -49,19 +50,19 @@ There are several parameters that can be changed:
 ```
 - Path to the token (monkeybot.h)
 ```
-#define PATH_TO_TOKEN "resources/token.txt"
+#define PATH_TO_TOKEN "/usr/src/monkeybot/resources/token.txt"
 ```
 - Path to the banwords (monkeybot.h)
 ```
-#define PATH_TO_BANWORDS "resources/banwords.txt"
+#define PATH_TO_BANWORDS "/usr/src/monkeybot/resources/banwords.txt"
 ```
 - Path to text answers (monkeybot.h)
 ```
-#define PATH_TO_TEXT_ANSWERS "resources/monkeyanswers.txt"
+#define PATH_TO_TEXT_ANSWERS "/usr/src/monkeybot/resources/monkeyanswers.txt"
 ```
 - Path to IDs of stickers (monkeybot.h)
 ```
-#define PATH_TO_STICKERS_ANSWERS "resources/monkeystickers.txt"
+#define PATH_TO_STICKERS_ANSWERS "/usr/src/monkeybot/resources/monkeystickers.txt"
 ```
 - The maximum size of workers in Thread Pool (threadpool.h)
 ```
@@ -73,11 +74,23 @@ There are several parameters that can be changed:
 ```
 - Path to requests logs (logger.h)
 ```
-#define REQUEST_PATH "resources/logs/requests.txt"
+#define REQUEST_PATH "/usr/src/monkeybot/resources/logs/requests.txt"
 ```
 - Path to responses logs (logger.h)
 ```
-#define RESPONSE_PATH "resources/logs/responses.txt"
+#define RESPONSE_PATH "/usr/src/monkeybot/resources/logs/responses.txt"
+```
+- Path to error logs (logger.h)
+```
+#define RESPONSE_PATH "/usr/src/monkeybot/resources/logs/errors.txt"
+```
+- Path to responses logs (logger.h)
+```
+#define ERROR_PATH "/usr/src/monkeybot/resources/logs/responses.txt"
+```
+- Path to other logs (logger.h)
+```
+#define SMTH_PATH "/usr/src/monkeybot/resources/logs/smth.txt"
 ```
 ---
 #### Files
@@ -102,19 +115,15 @@ resources/monkeystickers.txt
 
 - Logs are stored in
 ```
-resources/logs
+resources/logs/
 ```
 ---
 #### Run
-- To compile and run, invoke:
+First, make the script executable:
 ```
-$ make
+$ chmod +x run_docker.sh
 ```
-- To compile in thread debug mode and run, invoke:
+Secondly, run script (the bot will be launched in the docker):
 ```
-$ make thread
-```
-- To compile in address debug mode and run, invoke:
-```
-$ make debug
+$ ./run_docker.sh
 ```

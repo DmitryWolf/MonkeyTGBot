@@ -8,10 +8,10 @@
 #include "threadpool.h"
 #include "logger.h"
 
-#define PATH_TO_TOKEN "resources/token.txt"
-#define PATH_TO_BANWORDS "resources/banwords.txt"
-#define PATH_TO_TEXT_ANSWERS "resources/monkeyanswers.txt"
-#define PATH_TO_STICKERS_ANSWERS "resources/monkeystickers.txt"
+#define PATH_TO_TOKEN "/usr/src/monkeybot/resources/token.txt"
+#define PATH_TO_BANWORDS "/usr/src/monkeybot/resources/banwords.txt"
+#define PATH_TO_TEXT_ANSWERS "/usr/src/monkeybot/resources/monkeyanswers.txt"
+#define PATH_TO_STICKERS_ANSWERS "/usr/src/monkeybot/resources/monkeystickers.txt"
 #define DEFAULT_MESSAGE ""
 #define DEFAULT_SIZE 1024 
 #define REQUEST_SIZE 2048

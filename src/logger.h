@@ -4,10 +4,10 @@
 #include <stdio.h>
 #include <pthread.h>
 
-#define REQUEST_PATH "resources/logs/requests.txt"
-#define RESPONSE_PATH "resources/logs/responses.txt"
-#define ERROR_PATH "resources/logs/errors.txt"
-#define SMTH_PATH "resources/logs/text.txt"
+#define REQUEST_PATH "/usr/src/monkeybot/resources/logs/requests.txt"
+#define RESPONSE_PATH "/usr/src/monkeybot/resources/logs/responses.txt"
+#define ERROR_PATH "/usr/src/monkeybot/resources/logs/errors.txt"
+#define SMTH_PATH "/usr/src/monkeybot/resources/logs/smth.txt"
 
 extern pthread_mutex_t mutex_log_;
 
