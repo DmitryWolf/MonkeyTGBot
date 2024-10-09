@@ -6,6 +6,7 @@
 #include "monkey.h"
 #include "connection.h" // "threadpoo.h" contains "connection.h"
 #include "threadpool.h"
+#include "logger.h"
 
 #define PATH_TO_TOKEN "resources/token.txt"
 #define PATH_TO_BANWORDS "resources/banwords.txt"

@@ -40,6 +40,7 @@ int threadpool_join(threadpool* tp) {
 }
 
 void* worker_routine(void* arg) {
+    printf("Threadpool's thread ID: %lu\n", pthread_self());
     threadpool_with_connection* tpwc = (threadpool_with_connection*)arg;
     while (1) {
         Task* task = (Task*)mpmcqueue_take(&tpwc->tp_->tasks_);

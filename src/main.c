@@ -1,4 +1,5 @@
 #include "monkeybot.h"
+
 #include <signal.h>
 #include <unistd.h>
 #include <pthread.h>
@@ -17,7 +18,10 @@ void *init_bot(void *arg) {
     return NULL;
 }
 
-void handle_sigint(int sig) {
+void handle_signal(int sig) {
+    if (sig == SIGPIPE) {
+        LOG(ERROR_PATH, DEFAULT_MESSAGE, ERROR);
+    } 
     printf("\nCompletion of the program...\n");
     while (is_initialized == 0) {
         // Backoff
@@ -28,9 +32,11 @@ void handle_sigint(int sig) {
     exit(0);
 }
 
-int main(){
-    signal(SIGINT, handle_sigint);
 
+int main(){
+    signal(SIGINT, handle_signal);
+    signal(SIGPIPE, handle_signal);
+    printf("Main thread ID: %lu\n", pthread_self());
     if (pthread_create(&init_thread, NULL, init_bot, NULL) != 0) {
         fprintf(stderr, "Failed to create init thread.\n");
         return -1;

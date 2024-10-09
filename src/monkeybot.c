@@ -1,7 +1,6 @@
 #include "monkeybot.h"
 #include "task.h"
 #include "hash.h"
-#include "logger.h"
 
 #include <unistd.h>
 #include <netdb.h>
@@ -34,14 +33,14 @@ void send_msg(void* args) {
             break;
     }
 
-    LOG(REQUEST_PATH, request, 0);
+    LOG(REQUEST_PATH, request, REQUEST);
 
     while (send_https_request(task->context_, request, response, sizeof(response)) == -1) {
         // fprintf(stderr, "Error in sending message request\n");
         while (connection_restart(task->context_, task->bot_->host_, task->bot_->port_) == -1);
     }
     
-    LOG(RESPONSE_PATH, response, 1);
+    LOG(RESPONSE_PATH, response, RESPONSE);
 
     free(task);
 }
@@ -110,14 +109,14 @@ int telebot_get_updates(Telebot *bot, char *response, size_t response_size) {
 
     make_update_request(bot, request);
 
-    LOG(REQUEST_PATH, request, 0);
+    LOG(REQUEST_PATH, request, REQUEST);
 
     while (send_https_request(&bot->context_, request, response, response_size) == -1) {
         // fprintf(stderr, "Error in sending getUpdates request\n");
         while (connection_restart(&bot->context_, bot->host_, bot->port_) == -1);
     }
 
-    LOG(RESPONSE_PATH, response, 1);
+    LOG(RESPONSE_PATH, response, RESPONSE);
 
     // Find last update_id
     char *update_id_str = response;
