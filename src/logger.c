@@ -69,7 +69,12 @@ void LOG(const char *path, const char *text, LOG_TYPE type) {
         } break;
         case ERROR:{
             body = LOG_DUMP();
-        }
+        } break;
+        case SMTH:{
+            body = LOG_DUMP();
+        } break;
+        default: 
+            break;
     }
     size_t size = strlen(body);
 

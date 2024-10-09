@@ -37,6 +37,8 @@ int main(){
     signal(SIGINT, handle_signal);
     signal(SIGPIPE, handle_signal);
     printf("Main thread ID: %lu\n", pthread_self());
+    LOG(SMTH_PATH, DEFAULT_MESSAGE, SMTH);
+
     if (pthread_create(&init_thread, NULL, init_bot, NULL) != 0) {
         fprintf(stderr, "Failed to create init thread.\n");
         return -1;

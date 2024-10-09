@@ -7,13 +7,15 @@
 #define REQUEST_PATH "resources/logs/requests.txt"
 #define RESPONSE_PATH "resources/logs/responses.txt"
 #define ERROR_PATH "resources/logs/errors.txt"
+#define SMTH_PATH "resources/logs/text.txt"
 
 extern pthread_mutex_t mutex_log_;
 
 typedef enum{
     REQUEST,
     RESPONSE,
-    ERROR
+    ERROR,
+    SMTH
 } LOG_TYPE;
 
 void LOG_INIT();
