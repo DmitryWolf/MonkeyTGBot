@@ -1,4 +1,4 @@
-#include "unbounded_blockng_mpmc_queue.h"
+#include "unbounded_blocking_mpmc_queue.h"
 
 // Constructor
 void mpmcqueue_init(unbounded_blockng_mpmc_queue *mpmc_queue) {
