@@ -63,6 +63,8 @@ TelegramMessage* parse_telegram_response(const char *response, size_t *size) {
             json_t *message_id = json_object_get(message, "message_id");
             if (json_is_integer(message_id)) {
                 messages[index].message_id_ = json_integer_value(message_id);
+            } else {
+                messages[index].message_id_ = -1;
             }
 
             // Get info of user
@@ -73,14 +75,20 @@ TelegramMessage* parse_telegram_response(const char *response, size_t *size) {
                 json_t *username = json_object_get(from, "username");
                 if (json_is_integer(from_id)) {
                     messages[index].from_id_ = json_integer_value(from_id);
+                } else {
+                    messages[index].from_id_ = -1;
                 }
                 if (json_is_string(first_name)) {
                     strncpy(messages[index].first_name_, json_string_value(first_name), sizeof(messages[index].first_name_) - 1);
                     messages[index].first_name_[sizeof(messages[index].first_name_) - 1] = '\0'; // Overflow protection
+                } else {
+                    messages[index].first_name_[0] = '\0';
                 }
                 if (json_is_string(username)) {
                     strncpy(messages[index].username_, json_string_value(username), sizeof(messages[index].username_) - 1);
                     messages[index].username_[sizeof(messages[index].username_) - 1] = '\0'; // Overflow protection
+                } else {
+                    messages[index].username_[0] = '\0';
                 }
             }
 
@@ -91,10 +99,14 @@ TelegramMessage* parse_telegram_response(const char *response, size_t *size) {
                 json_t *chat_title = json_object_get(chat, "title");
                 if (json_is_integer(chat_id)) {
                     messages[index].chat_id_ = json_integer_value(chat_id);
+                } else {
+                    messages[index].chat_id_ = -1;
                 }
                 if (json_is_string(chat_title)) {
                     strncpy(messages[index].chat_title_, json_string_value(chat_title), sizeof(messages[index].chat_title_) - 1);
                     messages[index].chat_title_[sizeof(messages[index].chat_title_) - 1] = '\0'; // Overflow protection
+                } else {
+                    messages[index].chat_title_[0] = '\0';
                 }
             }
 
@@ -103,6 +115,8 @@ TelegramMessage* parse_telegram_response(const char *response, size_t *size) {
             if (json_is_string(text)) {
                 strncpy(messages[index].text_, json_string_value(text), sizeof(messages[index].text_) - 1);
                 messages[index].text_[sizeof(messages[index].text_) - 1] = '\0'; // Overflow protection
+            } else {
+                messages[index].text_[0] = '\0';
             }
         }
     }

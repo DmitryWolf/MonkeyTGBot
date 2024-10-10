@@ -6,19 +6,7 @@ It was conceived as a bot that sends monkey phrases or stickers with monkeys, bu
 The bot looks at the messages that are sent to him/ in conversation with him, searches for the occurrence of bahword in the message and, if found, randomly sends either a random phrase or a random sticker in response to this message.
 
 ### Dependencies
-First of all, you need to download [Docker](https://docs.docker.com/get-started/get-docker/).
-
-Secondly, too run the program, you need to install libraries [openssl](https://github.com/openssl/openssl) and [jansson](https://github.com/akheron/jansson)
-- How to install dependencies on Ubuntu 20.04:
-```
-$ sudo apt install libssl-dev
-$ sudo apt install libjansson-dev
-```
--  How to install dependencies on Mac OS via the brew package manager (https://brew.sh/):
-```
-$ brew install openssl
-$ brew install jansson
-```
+You need to download [Docker](https://docs.docker.com/get-started/get-docker/).
 
 ### Usage
 
