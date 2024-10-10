@@ -107,11 +107,7 @@ resources/logs/
 ```
 ---
 #### Run
-First, make the script executable:
-```
-$ chmod +x run_docker.sh
-```
-Secondly, run script (the bot will be launched in the docker):
+Run script (the bot will be launched in the docker):
 ```
 $ ./run_docker.sh
 ```
