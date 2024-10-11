@@ -16,4 +16,6 @@ typedef struct {
 
 TelegramMessage* parse_telegram_response(const char *response, size_t *size);
 
+int get_last_update_id(const char *response, int is_first_parsing);
+
 #endif // PARSER_H

@@ -119,16 +119,14 @@ int telebot_get_updates(Telebot *bot, char *response, size_t response_size) {
     LOG(RESPONSE_PATH, response, RESPONSE);
 
     // Find last update_id
-    char *update_id_str = response;
-    int last_update_id = -1;
-    while ((update_id_str = strstr(update_id_str, "\"update_id\":")) != NULL) {
-        int current_update_id = atoi(update_id_str + strlen("\"update_id\":"));
-        last_update_id = current_update_id;
-        update_id_str += strlen("\"update_id\":");
-    }
-
-    if (last_update_id != -1) {
-        bot->offset_ = last_update_id + 1;
+    int last_update_id = get_last_update_id(response, bot->offset_ == 0 ? 1 : 0);
+    
+    if (last_update_id != -1 && last_update_id != 0) {
+        if (bot->offset_ == 0) {
+            bot->offset_ = last_update_id + 1;
+        } else {
+            bot->offset_ += last_update_id;
+        }
     }
 
     return 0;

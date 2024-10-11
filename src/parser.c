@@ -125,3 +125,66 @@ TelegramMessage* parse_telegram_response(const char *response, size_t *size) {
     json_decref(root);
     return messages;
 }
+
+int get_last_update_id(const char *response, int is_first_parsing) {
+    // Find JSON body
+    const char *json_body = strstr(response, "\r\n\r\n");
+    if (!json_body) {
+        printf("Error: The response body was not found\n");
+        return -1;
+    }
+
+    // Skip "\r\n\r\n"
+    json_body += 4;
+
+    // -----Parsing-----
+
+    json_t *root;
+    json_error_t error;
+
+    root = json_loads(json_body, 0, &error);
+    if (!root) {
+        fprintf(stderr, "Error in parsing JSON: %s\n", error.text);
+        return -1;
+    }
+
+    json_t *ok_field = json_object_get(root, "ok");
+    if (!json_is_true(ok_field)) {
+        printf("Error in request to JSON API.\n");
+        json_decref(root);
+        return -1;
+    }
+
+    json_t *result = json_object_get(root, "result");
+    if (!result) {
+        printf("Result is empty.\n");
+        json_decref(root);
+        return -1;
+    }
+
+    if (!json_is_array(result)) {
+        printf("Result is not an array (type: %d).\n", json_typeof(result));
+        json_decref(root);
+        return -1;
+    }
+
+    int count = json_array_size(result);
+
+    size_t index;
+    json_t *update;
+    int last_update_id = 0;
+    if (is_first_parsing) {
+        json_array_foreach(result, index, update) {
+            json_t *update_id = json_object_get(update, "update_id");
+            if (json_is_integer(update_id)) {
+                last_update_id = json_integer_value(update_id);
+            }
+        }
+    }
+
+    json_decref(root);
+    if (is_first_parsing) {
+        count = last_update_id;
+    }
+    return count;
+}
