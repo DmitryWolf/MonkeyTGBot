@@ -16,7 +16,7 @@
 #define DEFAULT_SIZE 1024 
 #define REQUEST_SIZE 2048
 #define RESPONSE_SIZE 32768
-#define LIMIT_REQUESTS 100
+#define LIMIT_REQUESTS 10
 #define SSLREAD_SIZE 16384 // max size of 1 SSL_read response
 #define TIME_TO_SLEEP 60
 

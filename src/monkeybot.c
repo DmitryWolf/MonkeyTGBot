@@ -136,6 +136,11 @@ int telebot_get_updates(Telebot *bot, char *response, size_t response_size) {
 int telebot_process_updates(Telebot *bot, const char *response) {
     size_t tm_size;
     TelegramMessage *messages = parse_telegram_response(response, &tm_size);
+    
+    if (!messages) {
+        printf("Error: messages is empty\n");
+        return -1;
+    }
 
     for (size_t tm_i = 0; tm_i < tm_size; ++tm_i) {
         TelegramMessage* tm = &messages[tm_i];

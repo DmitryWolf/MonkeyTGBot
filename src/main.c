@@ -49,8 +49,8 @@ int main(){
     }
 
     printf("Bot started\n\n");
+    char response[8 * RESPONSE_SIZE];
     while (1) {
-        char response[RESPONSE_SIZE];
         telebot_get_updates(&bot, response, sizeof(response));
         telebot_process_updates(&bot, response);
     }
