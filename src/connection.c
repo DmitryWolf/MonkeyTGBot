@@ -40,7 +40,16 @@ int connection_init(connection* context, const char *host, const char *port) {
 
 void connection_destroy(connection* context) {
     if (context->ssl_) {
-        SSL_shutdown(context->ssl_);
+        int shutdown_state = SSL_get_shutdown(context->ssl_);
+        if (shutdown_state == 0) {
+            int ret = SSL_shutdown(context->ssl_);
+            if (ret < 0) {
+                int ssl_err = SSL_get_error(context->ssl_, ret);
+                if (ssl_err == SSL_ERROR_SYSCALL || ssl_err == SSL_ERROR_SSL) {
+                    ERR_print_errors_fp(stderr);
+                }
+            }
+        }
         SSL_free(context->ssl_);
     }
 
