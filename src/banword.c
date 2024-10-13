@@ -1,5 +1,4 @@
 #include "banword.h"
-#include "hash.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -8,7 +7,6 @@
 void add_banword(Banmonkey banwords[], int *banword_count, const char *word) {
     if (*banword_count < MAX_BANWORDS) {
         banwords[*banword_count].word_ = strdup(word);
-        banwords[*banword_count].hash_ = hash(word);
         (*banword_count)++;
     }
 }
@@ -26,15 +24,10 @@ int* find_banwords(Banmonkey banwords[], int banword_count, const char *text, in
                 strncpy(substr, text + i, word_len);
                 substr[word_len] = '\0';
 
-                unsigned long substr_hash = hash(substr);
-
-                if (substr_hash == banwords[j].hash_) {
-                    // because of collisions
-                    if (strncmp(substr, banwords[j].word_, word_len) == 0) {
-                        results[*result_count] = i;
-                        results[*result_count + 1] = i + word_len;
-                        *result_count += 2;
-                    }
+                if (strncmp(substr, banwords[j].word_, word_len) == 0) {
+                    results[*result_count] = i;
+                    results[*result_count + 1] = i + word_len;
+                    *result_count += 2;
                 }
             }
         }

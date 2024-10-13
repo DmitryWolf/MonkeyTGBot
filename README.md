@@ -60,6 +60,10 @@ There are several parameters that can be changed:
 ```
 #define MAX_LINE_LEN 256
 ```
+- The maximum size of a text in JSON-response (parser.h)
+```
+#define MAX_TEXT_SIZE 9216
+```
 - Path to requests logs (logger.h)
 ```
 #define REQUEST_PATH "/usr/src/monkeybot/resources/logs/requests.txt"

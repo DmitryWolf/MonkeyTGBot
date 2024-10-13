@@ -53,6 +53,8 @@ void LOG(const char *path, const char *text, LOG_TYPE type) {
     pthread_mutex_lock(&mutex_log_);
 
     const char *body;
+    char *allocated_body = NULL;
+
     switch(type) {
         case REQUEST:{
             body = text;
@@ -68,10 +70,12 @@ void LOG(const char *path, const char *text, LOG_TYPE type) {
             }
         } break;
         case ERROR:{
-            body = LOG_DUMP();
+            allocated_body = LOG_DUMP();
+            body = allocated_body;
         } break;
         case SMTH:{
-            body = LOG_DUMP();
+            allocated_body = LOG_DUMP();
+            body = allocated_body;
         } break;
         default: 
             break;
@@ -90,6 +94,9 @@ void LOG(const char *path, const char *text, LOG_TYPE type) {
     FILE *file = fopen(path, "a");
     if (!file) {
         fprintf(stderr, "Error in opening log-file\n");
+        if (allocated_body) {
+            free(allocated_body);
+        }
         return;
     }
     fprintf(file, "DUMP [%s] : ", time_buffer);
@@ -97,6 +104,9 @@ void LOG(const char *path, const char *text, LOG_TYPE type) {
     fprintf(file, "\n");
     fclose(file);
 
+    if (allocated_body) {
+        free(allocated_body);
+    }
 
     pthread_mutex_unlock(&mutex_log_);
     

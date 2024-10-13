@@ -5,7 +5,6 @@
 
 typedef struct {
     char *word_;
-    unsigned long hash_;
 } Banmonkey;
 
 

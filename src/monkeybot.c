@@ -1,6 +1,5 @@
 #include "monkeybot.h"
 #include "task.h"
-#include "hash.h"
 
 #include <unistd.h>
 #include <netdb.h>
@@ -18,15 +17,15 @@ void send_msg(void* args) {
 
     switch(task->type_) {
         case TEXT:{
-            make_text_message(task->bot_, escaped_message, request, task->tm_->chat_id_);
+            make_text_message(task->bot_, escaped_message, request, task->chat_id_);
         } break;
         case REPLY_TEXT:{
-            make_text_message_with_reply(task->bot_, escaped_message, request, task->tm_->chat_id_, task->tm_->message_id_);
+            make_text_message_with_reply(task->bot_, escaped_message, request, task->chat_id_, task->message_id_);
         } break;
         case REPLY_STICKER:{
             make_sticker_message_with_reply(
                 task->bot_, task->bot_->monkey_stickers_[myrandom(0, task->bot_->count_monkey_stickers_ - 1)],
-                request, task->tm_->chat_id_, task->tm_->message_id_
+                request, task->chat_id_, task->message_id_
             );
         } break;
         default:
@@ -182,15 +181,17 @@ int telebot_process_updates(Telebot *bot, const char *response) {
             Task* task = malloc(sizeof(Task));
             task->bot_ = bot;
             task->message_ = monkeyword;
-            task->tm_ = tm;
+            task->message_id_ = tm->message_id_;
+            task->from_id_ = tm->from_id_;
+            task->chat_id_ = tm->chat_id_;
             // task->context_: skip
             task->type_ = type;
             threadpool_submit(&bot->pool_, task);
 
         }
-
         free(finder_banwords);
     }
+    free(messages);
     return 0;
 }
 
