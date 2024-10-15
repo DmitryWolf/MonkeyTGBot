@@ -3,7 +3,7 @@
 
 // #include <stddef.h> // "jansson.h" contains "stddef.h"
 #include <jansson.h>
-#define MAX_TEXT_SIZE 9216 // 8192
+#define MAX_TEXT_SIZE 8196 // 8192+4
 
 typedef struct {
     long long message_id_;

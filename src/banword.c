@@ -24,6 +24,7 @@ int* find_banwords(Banmonkey banwords[], int banword_count, const char *text, in
                 strncpy(substr, text + i, word_len);
                 substr[word_len] = '\0';
 
+                
                 if (strncmp(substr, banwords[j].word_, word_len) == 0) {
                     results[*result_count] = i;
                     results[*result_count + 1] = i + word_len;

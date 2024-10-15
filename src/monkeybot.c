@@ -135,7 +135,7 @@ int telebot_get_updates(Telebot *bot, char *response, size_t response_size) {
 int telebot_process_updates(Telebot *bot, const char *response) {
     size_t tm_size;
     TelegramMessage *messages = parse_telegram_response(response, &tm_size);
-    
+
     if (!messages) {
         printf("Error: messages is empty\n");
         return -1;
@@ -181,14 +181,15 @@ int telebot_process_updates(Telebot *bot, const char *response) {
             Task* task = malloc(sizeof(Task));
             task->bot_ = bot;
             task->message_ = monkeyword;
+            task->chat_id_ = tm->chat_id_;
             task->message_id_ = tm->message_id_;
             task->from_id_ = tm->from_id_;
-            task->chat_id_ = tm->chat_id_;
             // task->context_: skip
             task->type_ = type;
             threadpool_submit(&bot->pool_, task);
 
         }
+
         free(finder_banwords);
     }
     free(messages);
