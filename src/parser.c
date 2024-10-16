@@ -57,6 +57,10 @@ TelegramMessage* parse_telegram_response(const char *response, size_t *size) {
     size_t index;
     json_t *update;
     json_array_foreach(result, index, update) {
+        json_t *edited_message = json_object_get(update, "edited_message");
+        if (edited_message) {
+            continue;
+        }
         json_t *message = json_object_get(update, "message");
         if (message) {
             // Get message_id_
@@ -66,7 +70,7 @@ TelegramMessage* parse_telegram_response(const char *response, size_t *size) {
             } else {
                 messages[index].message_id_ = -1;
             }
-
+            
             // Get info of user
             json_t *from = json_object_get(message, "from");
             if (from) {

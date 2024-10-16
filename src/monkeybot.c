@@ -145,7 +145,7 @@ int telebot_process_updates(Telebot *bot, const char *response) {
         TelegramMessage* tm = &messages[tm_i];
         if (tm == NULL) {
             printf("No valid messages found.\n");
-            return -1;
+            continue;
         }
 
         int size_bans;
