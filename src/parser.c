@@ -57,70 +57,80 @@ TelegramMessage* parse_telegram_response(const char *response, size_t *size) {
     size_t index;
     json_t *update;
     json_array_foreach(result, index, update) {
-        json_t *edited_message = json_object_get(update, "edited_message");
-        if (edited_message) {
-            continue;
-        }
-        json_t *message = json_object_get(update, "message");
-        if (message) {
-            // Get message_id_
-            json_t *message_id = json_object_get(message, "message_id");
-            if (json_is_integer(message_id)) {
-                messages[index].message_id_ = json_integer_value(message_id);
-            } else {
-                messages[index].message_id_ = -1;
-            }
-            
-            // Get info of user
-            json_t *from = json_object_get(message, "from");
-            if (from) {
-                json_t *from_id = json_object_get(from, "id");
-                json_t *first_name = json_object_get(from, "first_name");
-                json_t *username = json_object_get(from, "username");
-                if (json_is_integer(from_id)) {
-                    messages[index].from_id_ = json_integer_value(from_id);
-                } else {
-                    messages[index].from_id_ = -1;
-                }
-                if (json_is_string(first_name)) {
-                    strncpy(messages[index].first_name_, json_string_value(first_name), sizeof(messages[index].first_name_) - 1);
-                    messages[index].first_name_[sizeof(messages[index].first_name_) - 1] = '\0'; // Overflow protection
-                } else {
-                    messages[index].first_name_[0] = '\0';
-                }
-                if (json_is_string(username)) {
-                    strncpy(messages[index].username_, json_string_value(username), sizeof(messages[index].username_) - 1);
-                    messages[index].username_[sizeof(messages[index].username_) - 1] = '\0'; // Overflow protection
-                } else {
-                    messages[index].username_[0] = '\0';
-                }
-            }
+        if (json_is_object(update)) {
+            void *iter = json_object_iter(update);
+            size_t idx = 0;
+            while (iter) {
+                const char *key = json_object_iter_key(iter);
+                json_t *value = json_object_iter_value(iter);
+                if (idx == 1) {
+                    if (strcmp(key, "message") != 0) {
+                        messages[index].message_id_ = -1;
+                        break;
+                    } else {
+                        // Get message_id_
+                        json_t *message_id = json_object_get(value, "message_id");
+                        if (json_is_integer(message_id)) {
+                            messages[index].message_id_ = json_integer_value(message_id);
+                        } else {
+                            messages[index].message_id_ = -1;
+                        }
+                        
+                        // Get info of user
+                        json_t *from = json_object_get(value, "from");
+                        if (from) {
+                            json_t *from_id = json_object_get(from, "id");
+                            json_t *first_name = json_object_get(from, "first_name");
+                            json_t *username = json_object_get(from, "username");
+                            if (json_is_integer(from_id)) {
+                                messages[index].from_id_ = json_integer_value(from_id);
+                            } else {
+                                messages[index].from_id_ = -1;
+                            }
+                            if (json_is_string(first_name)) {
+                                strncpy(messages[index].first_name_, json_string_value(first_name), sizeof(messages[index].first_name_) - 1);
+                                messages[index].first_name_[sizeof(messages[index].first_name_) - 1] = '\0'; // Overflow protection
+                            } else {
+                                messages[index].first_name_[0] = '\0';
+                            }
+                            if (json_is_string(username)) {
+                                strncpy(messages[index].username_, json_string_value(username), sizeof(messages[index].username_) - 1);
+                                messages[index].username_[sizeof(messages[index].username_) - 1] = '\0'; // Overflow protection
+                            } else {
+                                messages[index].username_[0] = '\0';
+                            }
+                        }
 
-            // Get info of chat
-            json_t *chat = json_object_get(message, "chat");
-            if (chat) {
-                json_t *chat_id = json_object_get(chat, "id");
-                json_t *chat_title = json_object_get(chat, "title");
-                if (json_is_integer(chat_id)) {
-                    messages[index].chat_id_ = json_integer_value(chat_id);
-                } else {
-                    messages[index].chat_id_ = -1;
-                }
-                if (json_is_string(chat_title)) {
-                    strncpy(messages[index].chat_title_, json_string_value(chat_title), sizeof(messages[index].chat_title_) - 1);
-                    messages[index].chat_title_[sizeof(messages[index].chat_title_) - 1] = '\0'; // Overflow protection
-                } else {
-                    messages[index].chat_title_[0] = '\0';
-                }
-            }
+                        // Get info of chat
+                        json_t *chat = json_object_get(value, "chat");
+                        if (chat) {
+                            json_t *chat_id = json_object_get(chat, "id");
+                            json_t *chat_title = json_object_get(chat, "title");
+                            if (json_is_integer(chat_id)) {
+                                messages[index].chat_id_ = json_integer_value(chat_id);
+                            } else {
+                                messages[index].chat_id_ = -1;
+                            }
+                            if (json_is_string(chat_title)) {
+                                strncpy(messages[index].chat_title_, json_string_value(chat_title), sizeof(messages[index].chat_title_) - 1);
+                                messages[index].chat_title_[sizeof(messages[index].chat_title_) - 1] = '\0'; // Overflow protection
+                            } else {
+                                messages[index].chat_title_[0] = '\0';
+                            }
+                        }
 
-            // Get text
-            json_t *text = json_object_get(message, "text");
-            if (json_is_string(text)) {
-                strncpy(messages[index].text_, json_string_value(text), sizeof(messages[index].text_) - 1);
-                messages[index].text_[sizeof(messages[index].text_) - 1] = '\0'; // Overflow protection
-            } else {
-                messages[index].text_[0] = '\0';
+                        // Get text
+                        json_t *text = json_object_get(value, "text");
+                        if (json_is_string(text)) {
+                            strncpy(messages[index].text_, json_string_value(text), sizeof(messages[index].text_) - 1);
+                            messages[index].text_[sizeof(messages[index].text_) - 1] = '\0'; // Overflow protection
+                        } else {
+                            messages[index].text_[0] = '\0';
+                        }
+                    }
+                }
+                iter = json_object_iter_next(update, iter);
+                idx++;
             }
         }
     }
