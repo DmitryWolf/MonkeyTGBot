@@ -119,7 +119,7 @@ int telebot_get_updates(Telebot *bot, char *response, size_t response_size) {
             count_of_errors++;
             sleep(TIME_TO_SLEEP);
             if (count_of_errors > MAX_COUNT_ERRORS) {
-                telebot_destroy(&bot);
+                telebot_destroy(bot);
                 exit(0);
             }
         }
