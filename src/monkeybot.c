@@ -110,9 +110,10 @@ int telebot_get_updates(Telebot *bot, char *response, size_t response_size) {
 
     LOG(REQUEST_PATH, request, REQUEST);
 
+    size_t count_of_errors = 0;
     while (send_https_request(&bot->context_, request, response, response_size) == -1) {
         // fprintf(stderr, "Error in sending getUpdates request\n");
-        size_t count_of_errors = 0;
+        count_of_errors++;
         while (connection_restart(&bot->context_, bot->host_, bot->port_) == -1) {
             fprintf(stderr, "Error in restart connection in get_updates\n");
             LOG(ERROR_PATH, DEFAULT_MESSAGE, ERROR);
@@ -122,6 +123,10 @@ int telebot_get_updates(Telebot *bot, char *response, size_t response_size) {
                 telebot_destroy(bot);
                 exit(0);
             }
+        }
+        if (count_of_errors > MAX_COUNT_ERRORS) {
+            telebot_destroy(bot);
+            exit(0);
         }
     }
 
