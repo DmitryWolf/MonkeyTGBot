@@ -162,6 +162,10 @@ int telebot_process_updates(Telebot *bot, const char *response) {
             printf("No valid messages found.\n");
             continue;
         }
+        
+        if (tm->message_id_ == -1) {
+            continue;
+        }
 
         int size_bans;
         int* finder_banwords = find_banwords(bot->banwords_, bot->banword_count_, tm->text_, &size_bans);
