@@ -43,6 +43,9 @@ void connection_destroy(connection* context) {
         int shutdown_state = SSL_get_shutdown(context->ssl_);
         if (shutdown_state == 0) {
             int ret = SSL_shutdown(context->ssl_);
+            if (ret == 0) {
+                ret = SSL_shutdown(context->ssl_);
+            }
             if (ret < 0) {
                 int ssl_err = SSL_get_error(context->ssl_, ret);
                 if (ssl_err == SSL_ERROR_SYSCALL || ssl_err == SSL_ERROR_SSL) {
@@ -51,6 +54,7 @@ void connection_destroy(connection* context) {
             }
         }
         SSL_free(context->ssl_);
+        context->ssl_ = NULL;
     }
 
     if (context->sockfd_ != -1) {
@@ -59,6 +63,7 @@ void connection_destroy(connection* context) {
 
     if (context->ctx_) {
         SSL_CTX_free(context->ctx_);
+        context->ctx_ = NULL;
     }
 }
 
