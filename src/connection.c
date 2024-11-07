@@ -59,6 +59,7 @@ void connection_destroy(connection* context) {
 
     if (context->sockfd_ != -1) {
         close(context->sockfd_);
+        context->sockfd_ = -1;
     }
 
     if (context->ctx_) {
